@@ -1,5 +1,9 @@
 node_modules/
 .next/
 out/
+dist/
+.portfolio-zip-staging/
+Portfolio-cua-Le-Trong-Hieu.zip
+/public/public/
 .DS_Store
 *.log

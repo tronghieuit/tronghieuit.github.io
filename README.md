@@ -1,16 +1,13 @@
-# Lê Trọng Hiếu — personal site
+# Lê Trọng Hiếu — Portfolio
 
-Source for the GitHub Pages portfolio at https://tronghieuit.github.io.
+Portfolio source for https://tronghieuit.github.io/, using the project from Portfolio-cua-Le-Trong-Hieu.zip.
 
-The site is a static Next.js export. Pushes to `main` build and publish it with GitHub Actions.
+The site uses React, Vite, and Tailwind CSS. Pushes to main build the static site and publish it with GitHub Actions.
 
-## Focus
+## Run locally
 
-- Vietnamese text-to-speech, multi-speaker synthesis, and zero-shot voice cloning
-- Lightweight models and practical inference
-- Python, PyTorch, and ONNX Runtime
+Run npm ci, then npm run dev.
 
-## Featured projects
+Build the static files with npm run build; Vite writes them to dist/.
 
-- [v-tts](https://github.com/tronghieuit/v-tts)
-- [tiny-tts](https://github.com/tronghieuit/tiny-tts)
+The portfolio highlights Vietnamese and English text-to-speech, lightweight inference, open-source projects, and credentials.
