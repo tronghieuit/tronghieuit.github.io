@@ -1,19 +1,16 @@
-import { type ReactNode } from 'react';
 import { useState } from 'react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ErrorBoundary } from '@/components/error-boundary';
-import { Toaster } from '@/components/ui/toaster';
-import { TooltipProvider } from '@/components/ui/tooltip';
-import NotFound from '@/pages/not-found';
-import { ArrowDownRight, ArrowRight, ArrowUpRight, Award, AudioLines, ExternalLink, Github, Radio } from 'lucide-react';
+import repositoryStars from './repo-stars.json';
 import {
-  Route,
-  Switch,
-  useLocation,
-  Router as WouterRouter,
-} from 'wouter';
-
-const queryClient = new QueryClient();
+  ArrowDownRight,
+  ArrowRight,
+  ArrowUpRight,
+  Award,
+  AudioLines,
+  ExternalLink,
+  Github,
+  Radio,
+  Star,
+} from '@/components/icons';
 
 function Home() {
   const [language, setLanguage] = useState<'en' | 'vi'>('en');
@@ -47,6 +44,8 @@ function Home() {
     p3: vi ? 'Ưu tiên mô hình nhỏ gọn, suy luận hiệu quả và công cụ mã nguồn mở.' : 'Prioritizing compact models, efficient inference, and open-source tooling.',
     credentials: vi ? 'Chứng chỉ & ghi nhận' : 'Credentials & recognition',
     credentialsEyebrow: vi ? 'Học tập · Cộng đồng · Chứng nhận' : 'Learning · Community · Certification',
+    githubStars: vi ? 'sao GitHub' : 'GitHub stars',
+    viewKaggle: vi ? 'Xem hồ sơ Kaggle' : 'View Kaggle profile',
     stackTitle: vi ? 'Công cụ trong tay' : 'Tools in hand',
     stackDesc: vi ? 'Một bộ công cụ tập trung, từ thử nghiệm mô hình đến suy luận trên thiết bị.' : 'A focused toolkit, from model experiments to inference at the edge.',
     closingEyebrow: vi ? 'Mã nguồn mở · Speech AI' : 'Open source · Speech AI',
@@ -58,10 +57,10 @@ function Home() {
   };
   const waveBars = [8,13,18,27,35,23,45,62,38,25,54,74,44,29,48,66,32,20,39,56,30,18,38,26,13,20,10,15,8,12,7,10,6,9,6,7,5,7,4,6,4,5,4,6,3,4,3,5,3,4,3,4,3,3,3,4,2,3,2,3,2,2,3,2,2,2];
   const credentials = [
-    { title: 'Kaggle Competition Expert', detail: vi ? 'Thành tích cá nhân' : 'Solo', icon: <Award size={15} /> },
     { title: 'Kaggle Notebook Master', detail: vi ? 'Kaggle' : 'Kaggle', icon: <AudioLines size={15} /> },
     { title: 'AWS Certified Solutions Architect – Associate', detail: 'AWS SAA', icon: <Radio size={15} />, href: 'https://www.credly.com/badges/70bb428a-394e-4400-95ca-ec3001031dcc/public_url' },
   ];
+  const formatStars = new Intl.NumberFormat(vi ? 'vi-VN' : 'en-US');
   return (
     <main className="portfolio">
       <div className="wrap">
@@ -105,11 +104,11 @@ function Home() {
             <div className="work-aside"><p>{copy.aside}</p><span className="mono">TTS · VOICE CLONING · INFERENCE</span></div>
             <div className="project-list">
               <article className="project">
-                <span className="project-number mono">01</span><div><h3>v-tts</h3><p>{copy.project1}</p><div className="project-tags">{copy.tagsVtts.map((tag) => <span key={tag}>{tag}</span>)}</div></div>
+                <span className="project-number mono">01</span><div><div className="project-heading"><h3>v-tts</h3><span className="project-stars"><Star size={14} /><strong>{formatStars.format(repositoryStars['v-tts'])}</strong><span>{copy.githubStars}</span></span></div><p>{copy.project1}</p><div className="project-tags">{copy.tagsVtts.map((tag) => <span key={tag}>{tag}</span>)}</div></div>
                 <a className="project-link" href="https://github.com/tronghieuit/v-tts" target="_blank" rel="noreferrer" aria-label={vi ? 'Xem kho mã v-tts trên GitHub' : 'View v-tts repository on GitHub'}>{copy.repository} <ArrowUpRight size={15} /></a>
               </article>
               <article className="project">
-                <span className="project-number mono">02</span><div><h3>tiny-tts</h3><p>{copy.project2}</p><div className="project-tags">{copy.tagsTiny.map((tag) => <span key={tag}>{tag}</span>)}</div></div>
+                <span className="project-number mono">02</span><div><div className="project-heading"><h3>tiny-tts</h3><span className="project-stars"><Star size={14} /><strong>{formatStars.format(repositoryStars['tiny-tts'])}</strong><span>{copy.githubStars}</span></span></div><p>{copy.project2}</p><div className="project-tags">{copy.tagsTiny.map((tag) => <span key={tag}>{tag}</span>)}</div></div>
                 <a className="project-link" href="https://github.com/tronghieuit/tiny-tts" target="_blank" rel="noreferrer" aria-label={vi ? 'Xem kho mã tiny-tts trên GitHub' : 'View tiny-tts repository on GitHub'}>{copy.repository} <ArrowUpRight size={15} /></a>
               </article>
             </div>
@@ -129,6 +128,14 @@ function Home() {
       <section className="credentials" id="credentials">
         <div className="wrap">
           <div className="credentials-head"><h2>{copy.credentials}</h2><span className="eyebrow">03 / {copy.credentialsEyebrow}</span></div>
+          <a className="featured-credential" href="https://www.kaggle.com/backtracking" target="_blank" rel="noreferrer" aria-label={vi ? 'Kaggle Competition Expert, Solo — xem hồ sơ Kaggle' : 'Kaggle Competition Expert, Solo — view Kaggle profile'}>
+            <span className="featured-credential-copy">
+              <span className="featured-credential-eyebrow"><span className="featured-credential-icon"><Award size={18} /></span><span className="mono">KAGGLE / COMPETITIONS</span></span>
+              <span className="featured-credential-title">Kaggle Competition Expert</span>
+              <span className="featured-credential-action">{copy.viewKaggle}<ArrowUpRight size={14} /></span>
+            </span>
+            <span className="featured-credential-stamp"><Award size={24} /><span>SOLO</span></span>
+          </a>
           <div className="credential-list">
             {credentials.map((item) => <div className="credential" key={item.title}>
               <div className="credential-title"><span className="credential-icon">{item.icon}</span>{item.title}</div>
@@ -162,35 +169,4 @@ function Home() {
   );
 }
 
-function Router() {
-  return (
-    // Keep a shared shell (sidebar, navbar) outside the boundary so it
-    // survives a page crash.
-    <RoutedErrorBoundary>
-      <Switch>
-        <Route path="/" component={Home} />
-        <Route component={NotFound} />
-      </Switch>
-    </RoutedErrorBoundary>
-  );
-}
-
-function RoutedErrorBoundary({ children }: { children: ReactNode }) {
-  const [location] = useLocation();
-  return <ErrorBoundary resetKey={location}>{children}</ErrorBoundary>;
-}
-
-function App() {
-  return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, '')}>
-          <Router />
-        </WouterRouter>
-        <Toaster />
-      </TooltipProvider>
-    </QueryClientProvider>
-  );
-}
-
-export default App;
+export default Home;
