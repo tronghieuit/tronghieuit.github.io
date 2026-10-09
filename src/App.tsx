@@ -154,10 +154,14 @@ function Home() {
             </div>
           </div>
           <div className="hero-art" aria-label={copy.avatar}>
-            <div className="signal-board">
-              <div className="portrait-frame"><img src="/images/profile-avatar.jpg" alt="Pixel-art portrait of Lê Trọng Hiếu" /></div>
-              <div className="orbital-wave" aria-hidden="true">{waveBars.map((height, index) => <i key={index} style={{ height: `${height}%` }} />)}</div>
-              <span className="orbit-label one">VIETNAMESE TTS</span><span className="orbit-label two">VOICE / MODEL / CODE</span><span className="orbit-label three">ZERO-SHOT × MULTI-SPEAKER</span>
+            <div className="hero-art-stage">
+              <div className="signal-board">
+                <div className="portrait-frame"><img src="/images/profile-avatar.jpg" alt="Pixel-art portrait of Lê Trọng Hiếu" /></div>
+                <div className="orbital-wave" aria-hidden="true">{waveBars.map((height, index) => <i key={index} style={{ height: `${height}%` }} />)}</div>
+              </div>
+              <div className="orbit-labels" aria-label="Speech system focus areas">
+                <span className="orbit-label one">VIETNAMESE TTS</span><span className="orbit-label two">VOICE / MODEL / CODE</span><span className="orbit-label three">ZERO-SHOT × MULTI-SPEAKER</span>
+              </div>
             </div>
             <span className="hero-index mono">01 — SPEECH SYSTEMS</span>
           </div>
