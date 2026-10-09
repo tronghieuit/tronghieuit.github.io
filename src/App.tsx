@@ -1,5 +1,7 @@
-import { useState } from 'react';
-import repositoryStars from './repo-stars.json';
+import {
+  useEffect,
+  useState,
+} from 'react';
 import {
   ArrowDownRight,
   ArrowRight,
@@ -15,6 +17,45 @@ import {
 function Home() {
   const [language, setLanguage] = useState<'en' | 'vi'>('en');
   const vi = language === 'vi';
+  const [repoStars, setRepoStars] = useState({ vTts: 381, tinyTts: 617 });
+  const [starsStatus, setStarsStatus] = useState<'loading' | 'live' | 'snapshot'>('loading');
+
+  useEffect(() => {
+    let isCurrent = true;
+
+    const readStars = async (repository: string): Promise<number> => {
+      const response = await fetch(`https://api.github.com/repos/tronghieuit/${repository}`, {
+        headers: { Accept: 'application/vnd.github+json' },
+      });
+      if (!response.ok) throw new Error(`GitHub returned ${response.status}`);
+
+      const repoData: unknown = await response.json();
+      if (
+        typeof repoData !== 'object' ||
+        repoData === null ||
+        !('stargazers_count' in repoData) ||
+        typeof repoData.stargazers_count !== 'number'
+      ) {
+        throw new Error('GitHub response did not include a star count');
+      }
+      return repoData.stargazers_count;
+    };
+
+    void Promise.all([readStars('v-tts'), readStars('tiny-tts')])
+      .then(([vTts, tinyTts]) => {
+        if (!isCurrent) return;
+        setRepoStars({ vTts, tinyTts });
+        setStarsStatus('live');
+      })
+      .catch(() => {
+        if (isCurrent) setStarsStatus('snapshot');
+      });
+
+    return () => {
+      isCurrent = false;
+    };
+  }, []);
+
   const copy = {
     navWork: vi ? 'Dự án' : 'Work',
     navFocus: vi ? 'Hướng tiếp cận' : 'Approach',
@@ -34,6 +75,13 @@ function Home() {
     aside: vi ? 'Tập trung vào mô hình tiếng nói chạy gọn, hỗ trợ nhiều giọng và dễ đưa vào sử dụng.' : 'Focused on speech models that run lean, support more voices, and are easier to put to work.',
     project1: vi ? 'Tổng hợp tiếng Việt nhẹ với TTS đa người nói và nhân bản giọng nói zero-shot.' : 'Lightweight Vietnamese text-to-speech with multi-speaker TTS and zero-shot voice cloning.',
     project2: vi ? 'Mô hình tiếng Anh gọn nhẹ, được thiết kế cho suy luận hiệu quả.' : 'A compact English TTS model designed for efficient inference.',
+    kaggleKicker: vi ? 'THÀNH TÍCH NỔI BẬT' : 'FEATURED DISTINCTION',
+    kaggleSolo: vi ? 'Thành tích cá nhân' : 'Solo',
+    kaggleProfile: vi ? 'Xem hồ sơ Kaggle' : 'View Kaggle profile',
+    starsLabel: vi ? 'sao' : 'stars',
+    starsLoading: vi ? 'Đang kiểm tra GitHub…' : 'Checking GitHub…',
+    starsLive: vi ? 'Cập nhật trực tiếp từ GitHub' : 'Live from GitHub',
+    starsSnapshot: vi ? 'Số liệu xác nhận ngày 09/10/2026' : 'Last confirmed 9 Oct 2026',
     approach: vi ? 'Cách tôi tiếp cận' : 'How I approach it',
     approachDesc: vi ? 'Speech AI không chỉ là mô hình. Tôi quan tâm đến toàn bộ con đường từ giọng nói đến trải nghiệm sử dụng.' : 'Speech AI is more than a model. I care about the whole path from voice to a useful experience.',
     p1Title: vi ? 'Tiếng Việt trước' : 'Vietnamese at the core',
@@ -44,8 +92,6 @@ function Home() {
     p3: vi ? 'Ưu tiên mô hình nhỏ gọn, suy luận hiệu quả và công cụ mã nguồn mở.' : 'Prioritizing compact models, efficient inference, and open-source tooling.',
     credentials: vi ? 'Chứng chỉ & ghi nhận' : 'Credentials & recognition',
     credentialsEyebrow: vi ? 'Học tập · Cộng đồng · Chứng nhận' : 'Learning · Community · Certification',
-    githubStars: vi ? 'sao GitHub' : 'GitHub stars',
-    viewKaggle: vi ? 'Xem hồ sơ Kaggle' : 'View Kaggle profile',
     stackTitle: vi ? 'Công cụ trong tay' : 'Tools in hand',
     stackDesc: vi ? 'Một bộ công cụ tập trung, từ thử nghiệm mô hình đến suy luận trên thiết bị.' : 'A focused toolkit, from model experiments to inference at the edge.',
     closingEyebrow: vi ? 'Mã nguồn mở · Speech AI' : 'Open source · Speech AI',
@@ -55,12 +101,18 @@ function Home() {
     footer: vi ? 'Mã nguồn mở · Speech AI' : 'Open source · Speech AI',
     avatar: vi ? 'Ảnh đại diện pixel' : 'Pixel portrait',
   };
+  const starsStatusText =
+    starsStatus === 'live' ? copy.starsLive :
+    starsStatus === 'snapshot' ? copy.starsSnapshot :
+    copy.starsLoading;
+  const formatStars = (count: number) =>
+    new Intl.NumberFormat(vi ? 'vi-VN' : 'en-US').format(count);
+
   const waveBars = [8,13,18,27,35,23,45,62,38,25,54,74,44,29,48,66,32,20,39,56,30,18,38,26,13,20,10,15,8,12,7,10,6,9,6,7,5,7,4,6,4,5,4,6,3,4,3,5,3,4,3,4,3,3,3,4,2,3,2,3,2,2,3,2,2,2];
   const credentials = [
     { title: 'Kaggle Notebook Master', detail: vi ? 'Kaggle' : 'Kaggle', icon: <AudioLines size={15} /> },
     { title: 'AWS Certified Solutions Architect – Associate', detail: 'AWS SAA', icon: <Radio size={15} />, href: 'https://www.credly.com/badges/70bb428a-394e-4400-95ca-ec3001031dcc/public_url' },
   ];
-  const formatStars = new Intl.NumberFormat(vi ? 'vi-VN' : 'en-US');
   return (
     <main className="portfolio">
       <div className="wrap">
@@ -80,6 +132,22 @@ function Home() {
             <p className="hero-kicker eyebrow rise"><span className="live-dot" />{copy.kicker}</p>
             <h1 className="rise delay">{copy.firstName}<span>{copy.lastName}</span></h1>
             <p className="hero-lede rise delay-more">{copy.intro}</p>
+            <a
+              className="kaggle-highlight rise delay-more"
+              href="https://www.kaggle.com/backtracking"
+              target="_blank"
+              rel="noreferrer"
+              aria-label={`${copy.kaggleProfile}: Kaggle Competition Expert, Solo`}
+              data-testid="badge-kaggle-expert"
+            >
+              <span className="kaggle-medallion"><Award size={19} /></span>
+              <span className="kaggle-highlight-copy">
+                <span className="kaggle-kicker mono">{copy.kaggleKicker}</span>
+                <span className="kaggle-title">Kaggle Competition Expert</span>
+              </span>
+              <span className="kaggle-solo">Solo</span>
+              <ArrowUpRight className="kaggle-arrow" size={16} />
+            </a>
             <div className="hero-ctas rise delay-more">
               <a className="button-primary" href="https://github.com/tronghieuit" target="_blank" rel="noreferrer">{copy.github}<ArrowUpRight size={16} /></a>
               <a className="button-quiet" href="#work">{copy.work}<ArrowDownRight size={16} /></a>
@@ -98,17 +166,23 @@ function Home() {
         <section className="section" id="work">
           <div className="section-heading">
             <div><span className="eyebrow">01 / {copy.work}</span><h2>{copy.work}</h2></div>
-            <p>{copy.workDescription}</p>
+            <div className="work-summary">
+              <p>{copy.workDescription}</p>
+              <span className={`stars-status ${starsStatus === 'live' ? 'is-live' : ''}`} aria-live="polite" data-testid="status-stars">
+                <span className="stars-status-dot" aria-hidden="true" />
+                {starsStatusText}
+              </span>
+            </div>
           </div>
           <div className="work-intro">
             <div className="work-aside"><p>{copy.aside}</p><span className="mono">TTS · VOICE CLONING · INFERENCE</span></div>
             <div className="project-list">
               <article className="project">
-                <span className="project-number mono">01</span><div><div className="project-heading"><h3>v-tts</h3><span className="project-stars"><Star size={14} /><strong>{formatStars.format(repositoryStars['v-tts'])}</strong><span>{copy.githubStars}</span></span></div><p>{copy.project1}</p><div className="project-tags">{copy.tagsVtts.map((tag) => <span key={tag}>{tag}</span>)}</div></div>
+                <span className="project-number mono">01</span><div><h3>v-tts</h3><p>{copy.project1}</p><div className="project-meta"><div className="project-tags">{copy.tagsVtts.map((tag) => <span key={tag}>{tag}</span>)}</div><span className="project-stars" data-testid="text-stars-v-tts"><Star size={14} aria-hidden="true" /><strong>{formatStars(repoStars.vTts)}</strong><span>{copy.starsLabel}</span></span></div></div>
                 <a className="project-link" href="https://github.com/tronghieuit/v-tts" target="_blank" rel="noreferrer" aria-label={vi ? 'Xem kho mã v-tts trên GitHub' : 'View v-tts repository on GitHub'}>{copy.repository} <ArrowUpRight size={15} /></a>
               </article>
               <article className="project">
-                <span className="project-number mono">02</span><div><div className="project-heading"><h3>tiny-tts</h3><span className="project-stars"><Star size={14} /><strong>{formatStars.format(repositoryStars['tiny-tts'])}</strong><span>{copy.githubStars}</span></span></div><p>{copy.project2}</p><div className="project-tags">{copy.tagsTiny.map((tag) => <span key={tag}>{tag}</span>)}</div></div>
+                <span className="project-number mono">02</span><div><h3>tiny-tts</h3><p>{copy.project2}</p><div className="project-meta"><div className="project-tags">{copy.tagsTiny.map((tag) => <span key={tag}>{tag}</span>)}</div><span className="project-stars" data-testid="text-stars-tiny-tts"><Star size={14} aria-hidden="true" /><strong>{formatStars(repoStars.tinyTts)}</strong><span>{copy.starsLabel}</span></span></div></div>
                 <a className="project-link" href="https://github.com/tronghieuit/tiny-tts" target="_blank" rel="noreferrer" aria-label={vi ? 'Xem kho mã tiny-tts trên GitHub' : 'View tiny-tts repository on GitHub'}>{copy.repository} <ArrowUpRight size={15} /></a>
               </article>
             </div>
@@ -128,14 +202,6 @@ function Home() {
       <section className="credentials" id="credentials">
         <div className="wrap">
           <div className="credentials-head"><h2>{copy.credentials}</h2><span className="eyebrow">03 / {copy.credentialsEyebrow}</span></div>
-          <a className="featured-credential" href="https://www.kaggle.com/backtracking" target="_blank" rel="noreferrer" aria-label={vi ? 'Kaggle Competition Expert, Solo — xem hồ sơ Kaggle' : 'Kaggle Competition Expert, Solo — view Kaggle profile'}>
-            <span className="featured-credential-copy">
-              <span className="featured-credential-eyebrow"><span className="featured-credential-icon"><Award size={18} /></span><span className="mono">KAGGLE / COMPETITIONS</span></span>
-              <span className="featured-credential-title">Kaggle Competition Expert</span>
-              <span className="featured-credential-action">{copy.viewKaggle}<ArrowUpRight size={14} /></span>
-            </span>
-            <span className="featured-credential-stamp"><Award size={24} /><span>SOLO</span></span>
-          </a>
           <div className="credential-list">
             {credentials.map((item) => <div className="credential" key={item.title}>
               <div className="credential-title"><span className="credential-icon">{item.icon}</span>{item.title}</div>
